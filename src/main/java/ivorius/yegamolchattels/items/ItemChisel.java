@@ -27,7 +27,11 @@ import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.BlockEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,31 +68,39 @@ public class ItemChisel extends ItemTool implements MicroblockSelector
     @Override
     public boolean onItemUse(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ)
     {
-        if (player.inventory.hasItem(YGCItems.clubHammer))
-        {
-            if (showMicroblockSelection(player, itemStack))
+        if (!world.isRemote) {
+            if (player.inventory.hasItem(YGCItems.clubHammer))
             {
-                int clubHammerSlot = IvInventoryHelper.getInventorySlotContainItem(player.inventory, YGCItems.clubHammer);
-                return chiselAway(x, y, z, player, itemStack, player.inventory.getStackInSlot(clubHammerSlot), carvingDistance, fragmentPickupChance);
+                BlockSnapshot blockSnapshot = new BlockSnapshot(world, x, y, z, Blocks.dirt, 0);
+                BlockEvent.PlaceEvent event = ForgeEventFactory.onPlayerBlockPlace(player, blockSnapshot, ForgeDirection.UNKNOWN);
+                if (!event.isCanceled())
+                {
+                    event.setCanceled(true);
+                    if (showMicroblockSelection(player, itemStack))
+                    {
+                        int clubHammerSlot = IvInventoryHelper.getInventorySlotContainItem(player.inventory, YGCItems.clubHammer);
+                        return chiselAway(x, y, z, player, itemStack, player.inventory.getStackInSlot(clubHammerSlot), carvingDistance, fragmentPickupChance);
+                    }
+                    else
+                    {
+                        if (StatueHelper.isValidStatueBlock(world, x, y, z))
+                        {
+                            if (!world.isRemote) // Some entities start with random sizes
+                            {
+                                player.openGui(YeGamolChattels.instance, YGCGuiHandler.statueCarvingGuiID, world, x, y, z);
+                            }
+
+                            return true;
+                        }
+                    }
+                }
             }
             else
             {
-                if (StatueHelper.isValidStatueBlock(world, x, y, z))
-                {
-                    if (!world.isRemote) // Some entities start with random sizes
-                    {
-                        player.openGui(YeGamolChattels.instance, YGCGuiHandler.statueCarvingGuiID, world, x, y, z);
-                    }
-
-                    return true;
-                }
+                player.addChatComponentMessage(new ChatComponentTranslation("item.ygcChisel.noHammer"));
             }
         }
-        else
-        {
-            if (!world.isRemote)
-                player.addChatComponentMessage(new ChatComponentTranslation("item.ygcChisel.noHammer"));
-        }
+
 
         return false;
     }
