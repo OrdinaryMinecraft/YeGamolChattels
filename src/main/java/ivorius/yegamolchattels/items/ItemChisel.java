@@ -19,6 +19,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
@@ -68,7 +69,8 @@ public class ItemChisel extends ItemTool implements MicroblockSelector
     @Override
     public boolean onItemUse(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ)
     {
-        if (!world.isRemote) {
+        if (!world.isRemote)
+        {
             if (player.inventory.hasItem(YGCItems.clubHammer))
             {
                 BlockSnapshot blockSnapshot = new BlockSnapshot(world, x, y, z, Blocks.dirt, 0);
@@ -101,7 +103,6 @@ public class ItemChisel extends ItemTool implements MicroblockSelector
             }
         }
 
-
         return false;
     }
 
@@ -122,6 +123,10 @@ public class ItemChisel extends ItemTool implements MicroblockSelector
                     ItemBlockFragment.setFragment(fragment, data);
                     player.inventory.addItemStackToInventory(fragment);
                     player.inventory.markDirty();
+                    if (player instanceof EntityPlayerMP)
+                    {
+                        ((EntityPlayerMP)player).sendContainerToPlayer(player.inventoryContainer);
+                    }
                 }
             }
 
