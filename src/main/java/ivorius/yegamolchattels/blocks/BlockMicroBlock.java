@@ -58,7 +58,15 @@ public class BlockMicroBlock extends Block
     @Override
     public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side)
     {
-        return ((TileEntityMicroBlock) world.getTileEntity(x, y, z)).isSideOpaque(side);
+        if (world.getTileEntity(x, y, z) != null) {
+            if (side != null) {
+                return ((TileEntityMicroBlock) world.getTileEntity(x, y, z)).isSideOpaque(side);
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     @Override
