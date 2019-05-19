@@ -59,6 +59,9 @@ public class TileEntityRendererStatue extends TileEntitySpecialRenderer
 
             Entity entity = tileEntityStatue.getStatue().getEntity();
             entity.setWorld(tileEntityStatue.getWorldObj());
+            entity.posX = 0.0;
+            entity.posY = 0.0;
+            entity.posZ = 0.0;
 
             int statusBarLength = BossStatus.statusBarTime; //Don't render boss health
 
