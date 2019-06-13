@@ -82,15 +82,22 @@ public class ItemStatue extends ItemBlock
     @Override
     public String getItemStackDisplayName(ItemStack par1ItemStack)
     {
-        String base = super.getUnlocalizedName(par1ItemStack) + ".base";
+        try
+        {
+            String base = super.getUnlocalizedName(par1ItemStack) + ".base";
 
-        String entityName = getStatueEntityID(par1ItemStack);
-        String localizedEntityName = entityName != null && entityName.length() > 0 ? I18n.format("entity." + entityName + ".name") : I18n.format("tile.ygcStatue.unknown");
+            String entityName = getStatueEntityID(par1ItemStack);
+            String localizedEntityName = entityName != null && entityName.length() > 0 ? I18n.format("entity." + entityName + ".name") : I18n.format("tile.ygcStatue.unknown");
 
-        Statue.BlockFragment blockFragment = getStatueBlockFragment(par1ItemStack);
-        String localizedBlockName = blockFragment != null ? new ItemStack(blockFragment.getBlock(), 1, blockFragment.getMetadata()).getDisplayName() : I18n.format("tile.ygcStatue.nomaterial");
+            Statue.BlockFragment blockFragment = getStatueBlockFragment(par1ItemStack);
+            String localizedBlockName = blockFragment != null ? new ItemStack(blockFragment.getBlock(), 1, blockFragment.getMetadata()).getDisplayName() : I18n.format("tile.ygcStatue.nomaterial");
 
-        return I18n.format(base, localizedEntityName, localizedBlockName);
+            return I18n.format(base, localizedEntityName, localizedBlockName);
+        }
+        catch (Throwable t)
+        {
+            return super.getUnlocalizedName(par1ItemStack);
+        }
     }
 
     @Override
